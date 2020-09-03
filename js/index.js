@@ -1,3 +1,5 @@
+const whatCountsAsLoad = 40;//40db
+const imagesForCharacter = ["./imagesForCharacter/step1.png","./imagesForCharacter/step2.png","./imagesForCharacter/step3.png","./imagesForCharacter/step4.png"];
 let mic = new Mic();
 let h = document.getElementById("header");
 let canvasANDshape = document.getElementById('canvasANDshape');
@@ -8,6 +10,10 @@ let canvasANDvideo = document.getElementById('canvasANDvideo');
 let canvasANDvideoCTX = canvasANDvideo.getContext("2d");
 let hiddenVideo = document.getElementById('hiddenVideo');
 let image = document.getElementById('image');
+let images1 = document.getElementById('images1');
+images1.src = imagesForCharacter[0];
+let images2 = document.getElementById('images2');
+images2.src = imagesForCharacter[0];
 let seconds = 0;
 let img = new Image();
 img.src = "./circle.png";
@@ -16,14 +22,19 @@ image.style.display = "";
 image.style.width = "100px";
 mic.onDBChange = function(DB){
     h.innerHTML = Math.round(DB) + " dB";
+    images1.src = imagesForCharacter[Math.max(Math.min(Math.floor(DB / (whatCountsAsLoad / imagesForCharacter.length)),4),0)];
+    if(DB > 40) images2.src = imagesForCharacter[3];
+    else if(DB > 30) images2.src = imagesForCharacter[2];
+    else images2.src = imagesForCharacter[0];
+
+
     canvasANDshapeCTX.clearRect(0, 0, canvasANDshape.width, canvasANDshape.height);
     canvasANDimageCTX.clearRect(0, 0, canvasANDimage.width, canvasANDimage.height);
     canvasANDshapeCTX.fillRect(50,100-(DB*0.5),100,DB);
     canvasANDimageCTX.drawImage(img,50,100-(DB*2),100,(DB*4));
     image.style.height = DB*3+"px";
-    //MAX = 2.88 | MIN = 0;
-    //DB = 40    | DB = 0;
-    hiddenVideo.currentTime = 2.88 - (DB / 13.888);
+    let videosLength = 2.88;
+    hiddenVideo.currentTime = videosLength - (DB / (whatCountsAsLoad / videosLength));
     canvasANDvideoCTX.drawImage(hiddenVideo,0,0,200,200);
 };
 mic.onFrequency = function(frequencyArray){
